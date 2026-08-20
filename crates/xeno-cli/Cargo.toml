@@ -1,0 +1,21 @@
+[package]
+name = "xeno-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+xeno-core = { workspace = true }
+xeno-router = { workspace = true }
+xeno-tools = { workspace = true }
+xeno-dag = { workspace = true }
+xeno-telemetry = { workspace = true }
+xeno-agent = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }

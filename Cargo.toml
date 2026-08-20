@@ -1,0 +1,61 @@
+[workspace]
+members = [
+    "crates/xeno-core",
+    "crates/xeno-router",
+    "crates/xeno-tools",
+    "crates/xeno-dag",
+    "crates/xeno-telemetry",
+    "crates/xeno-agent",
+    "crates/xeno-cli",
+    "crates/xeno-tauri",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.97.0"
+authors = ["Aman Gautam <https://github.com/Aman-Gautam67>", "Harsh Thakur <https://github.com/harshthakur750556>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Aman-Gautam67/Xeno-Inference"
+homepage = "https://github.com/Aman-Gautam67/Xeno-Inference"
+
+[workspace.dependencies]
+# Internal workspace crates
+xeno-core = { path = "crates/xeno-core" }
+xeno-router = { path = "crates/xeno-router" }
+xeno-tools = { path = "crates/xeno-tools" }
+xeno-dag = { path = "crates/xeno-dag" }
+xeno-telemetry = { path = "crates/xeno-telemetry" }
+xeno-agent = { path = "crates/xeno-agent" }
+
+# Async runtime & concurrency
+tokio = { version = "1.43", features = ["full", "tracing"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+futures = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["std", "sink", "async-await"] }
+async-trait = "0.1"
+
+# Serialization & JSON
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Networking & HTTP
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+http = "1.2"
+url = "2.5"
+
+# Observability & Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Data & Primitives
+uuid = { version = "1.11", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2.0"
+regex = "1.11"
+smallvec = { version = "1.13", features = ["serde"] }
+
+# Testing utilities
+wiremock = "0.6"
+tokio-test = "0.4"

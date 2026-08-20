@@ -1,0 +1,36 @@
+﻿# Rust / Cargo
+/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# Node / Frontend
+node_modules/
+/ui-canvas/node_modules/
+/ui-canvas/dist/
+/ui-canvas/dist-ssr/
+*.local
+
+# Tauri Build
+/crates/xeno-tauri/target/
+/crates/xeno-tauri/gen/
+
+# Multi-Agent Run State & Working Dirs
+.agents/
+.system_generated/
+*.log
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -1,81 +1,47 @@
-import React, { useState } from "react";
-import { PromptNode } from "./components/PromptNode";
-import { SubagentNode } from "./components/SubagentNode";
-import { DiffNode } from "./components/DiffNode";
-import { TelemetryHUD } from "./components/TelemetryHUD";
+﻿import React from "react";
+import { useWorkspaceStore } from "./stores/workspaceStore";
+import { HeaderNav } from "./components/layout/HeaderNav";
+import { SidebarExplorer } from "./components/layout/SidebarExplorer";
+import { TelemetryHUD } from "./components/layout/TelemetryHUD";
+import { OmniBar } from "./components/layout/OmniBar";
+import { SpatialCanvas } from "./components/canvas/SpatialCanvas";
+import { LiveExecutionDAG } from "./components/dag/LiveExecutionDAG";
+import { DeepThinkingTimeline } from "./components/timeline/DeepThinkingTimeline";
+import { SandboxedTerminalView } from "./components/terminal/SandboxedTerminalView";
+import { ASTDiffStudioView } from "./components/diff/ASTDiffStudioView";
+import { MultiAgentSwarmView } from "./components/swarm/MultiAgentSwarmView";
 
 export const App: React.FC = () => {
-  const [prompt, setPrompt] = useState("");
+  const { activeView } = useWorkspaceStore();
 
   return (
-    <div className="w-screen h-screen bg-neutral-950 text-neutral-100 flex flex-col justify-between p-6 relative overflow-hidden font-sans">
-      <TelemetryHUD
-        velocity={138.4}
-        costUsd={0.0182}
-        vramUsedGb={14.8}
-        vramTotalGb={24.0}
-        ttftMs={34}
-      />
+    <div className="w-screen h-screen bg-void text-neutral-100 flex flex-col justify-between relative overflow-hidden font-sans select-none">
+      {/* Top Navigation */}
+      <HeaderNav />
 
-      {/* Top Banner */}
-      <header className="flex items-center justify-between border-b border-neutral-900 pb-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-          <h1 className="text-sm font-bold tracking-widest uppercase font-mono text-cyan-400">
-            XENO INFERENCE // SPATIAL CANVAS
-          </h1>
-        </div>
-        <div className="text-xs font-mono text-neutral-500">TAURI V2 + REACT 19</div>
-      </header>
+      {/* Real-Time Floating Telemetry HUD (Shown on Canvas, Swarm, and DAG modes) */}
+      {(activeView === "canvas" || activeView === "swarm" || activeView === "dag") && (
+        <TelemetryHUD />
+      )}
 
-      {/* Central Canvas Viewport */}
-      <main className="flex-1 relative flex items-center justify-center space-x-8">
-        <PromptNode
-          id="node-1"
-          label="User Instruction"
-          content="Implement AST validation engine with multi-replace file editing"
-          status="completed"
-        />
-        <div className="w-8 h-[2px] bg-gradient-to-r from-cyan-500 to-emerald-500" />
-        <SubagentNode
-          id="node-2"
-          role="coder"
-          model="claude-3-7-sonnet"
-          phase="Act: AST Patching"
-          progress={100}
-        />
-        <div className="w-8 h-[2px] bg-gradient-to-r from-emerald-500 to-amber-500" />
-        <DiffNode
-          id="node-3"
-          filePath="crates/xeno-tools/src/ast_validator.rs"
-          diffContent="--- original\n+++ replacement\n-pub fn validate() {}\n+pub fn validate_syntax(&self, path: &Path, code: &str) -> Result<(), ToolError> {}"
-        />
-      </main>
+      {/* Main App Workspace */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Collapsible Left Explorer Sidebar */}
+        <SidebarExplorer />
 
-      {/* Bottom Omni-Bar */}
-      <footer className="w-full max-w-3xl mx-auto">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setPrompt("");
-          }}
-          className="relative flex items-center"
-        >
-          <input
-            type="text"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Type prompt or command (/swarm, /dag, /diff)..."
-            className="w-full bg-neutral-900/90 border border-neutral-800 focus:border-cyan-500 rounded-xl px-5 py-3.5 text-sm text-neutral-200 outline-none backdrop-blur-xl transition-all shadow-2xl font-mono"
-          />
-          <button
-            type="submit"
-            className="absolute right-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-mono font-semibold transition-all"
-          >
-            RUN
-          </button>
-        </form>
-      </footer>
+        {/* Dynamic Viewport Surface */}
+        <main className="flex-1 flex overflow-hidden relative">
+          {activeView === "canvas" && <SpatialCanvas />}
+          {activeView === "dag" && <LiveExecutionDAG />}
+          {activeView === "timeline" && <DeepThinkingTimeline />}
+          {activeView === "terminal" && <SandboxedTerminalView />}
+          {activeView === "diff" && <ASTDiffStudioView />}
+          {activeView === "swarm" && <MultiAgentSwarmView />}
+        </main>
+      </div>
+
+      {/* Bottom Command & Routing Omni-Bar */}
+      <OmniBar />
     </div>
   );
 };

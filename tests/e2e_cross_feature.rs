@@ -118,7 +118,7 @@ async fn test_tier3_swarm_roles_and_three_way_consensus() {
         findings: Vec<&'static str>,
     }
 
-    let consensus_evaluators = vec![
+    let consensus_evaluators = [
         ModelAuditVote { model: "claude-3-7-sonnet", approved: true, confidence: 0.98, findings: vec![] },
         ModelAuditVote { model: "deepseek-reasoner", approved: true, confidence: 0.95, findings: vec![] },
         ModelAuditVote { model: "qwen-2.5-72b-local", approved: true, confidence: 0.92, findings: vec![] },

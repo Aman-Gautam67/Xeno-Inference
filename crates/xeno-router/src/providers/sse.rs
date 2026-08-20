@@ -135,11 +135,7 @@ fn parse_single_event_block(block: &str) -> Option<SseEvent> {
             event_type = Some(rest.trim().to_string());
         } else if let Some(rest) = line.strip_prefix("data:") {
             // Remove single leading space after 'data:' if present according to SSE spec
-            let data_content = if rest.starts_with(' ') {
-                &rest[1..]
-            } else {
-                rest
-            };
+            let data_content = rest.strip_prefix(' ').unwrap_or(rest);
             data_lines.push(data_content.to_string());
         } else if let Some(rest) = line.strip_prefix("id:") {
             id = Some(rest.trim().to_string());

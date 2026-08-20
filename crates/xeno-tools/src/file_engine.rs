@@ -55,6 +55,7 @@ impl FileEngine {
     }
 
     /// Performs a character-exact, line-bounded substring replacement in `target_file`.
+    #[allow(clippy::too_many_arguments)]
     pub fn multi_replace_file_content(
         &self,
         target_file: &Path,

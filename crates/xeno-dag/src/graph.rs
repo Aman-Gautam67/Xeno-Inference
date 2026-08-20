@@ -177,7 +177,7 @@ impl XenoDAGGraph {
                 Some(dep_list) => dep_list.iter().all(|d_id| {
                     self.nodes
                         .get(d_id)
-                        .map_or(false, |d_node| d_node.status == NodeStatus::Success)
+                        .is_some_and(|d_node| d_node.status == NodeStatus::Success)
                 }),
             };
 
@@ -235,7 +235,7 @@ impl XenoDAGGraph {
     /// Performs a topological sort of all node IDs.
     pub fn topological_sort(&self) -> Result<Vec<String>, DAGError> {
         let mut in_degrees: HashMap<String, usize> = HashMap::new();
-        for (id, _) in &self.nodes {
+        for id in self.nodes.keys() {
             let in_deg = self.incoming_edges.get(id).map_or(0, |v| v.len());
             in_degrees.insert(id.clone(), in_deg);
         }

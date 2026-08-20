@@ -12,7 +12,7 @@ async fn test_e2e_vertical_slice_full_lifecycle() {
 
     // Phase 1: User Prompt Ingestion & Intent Routing
     let prompt = "Refactor calculation in math module and verify with unit tests";
-    assert!(!prompt.is_empty());
+    assert!(prompt.contains("math"));
     let selected_provider = "mock-router-provider";
     assert_eq!(selected_provider, "mock-router-provider");
     let assigned_role = "commander";

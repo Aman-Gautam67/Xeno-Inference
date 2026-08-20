@@ -280,6 +280,7 @@ struct SseContentBlockDelta {
 
 #[derive(Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
+#[allow(clippy::enum_variant_names)]
 enum SseDeltaPayload {
     TextDelta { text: String },
     ThinkingDelta { thinking: String },

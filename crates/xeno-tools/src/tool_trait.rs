@@ -7,21 +7,16 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 /// Security tier classifying tool execution risk.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum SecurityTier {
     /// Tier 1: Safe read-only inspection (auto-approved).
+    #[default]
     Tier1Safe = 1,
     /// Tier 2: Guarded mutation with diff snapshot & rollback capability.
     Tier2Guarded = 2,
     /// Tier 3: Destructive or elevated operation requiring explicit user confirmation.
     Tier3Destructive = 3,
-}
-
-impl Default for SecurityTier {
-    fn default() -> Self {
-        SecurityTier::Tier1Safe
-    }
 }
 
 /// Description and JSON schema of a tool.

@@ -3,20 +3,15 @@
 use serde::{Deserialize, Serialize};
 
 /// Specialized roles in the autonomous swarm council.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum SwarmRole {
+    #[default]
     Commander,
     Architect,
     Coder,
     QATester,
     RedTeamAuditor,
-}
-
-impl Default for SwarmRole {
-    fn default() -> Self {
-        SwarmRole::Commander
-    }
 }
 
 impl SwarmRole {

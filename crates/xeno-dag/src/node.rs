@@ -3,10 +3,11 @@
 use serde::{Deserialize, Serialize};
 
 /// Dynamic execution status of a DAG node.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum NodeStatus {
     /// Initial state waiting for dependencies.
+    #[default]
     Pending,
     /// Actively executing.
     Running,
@@ -16,12 +17,6 @@ pub enum NodeStatus {
     Failed,
     /// Self-healing retry triggered.
     SelfHealing,
-}
-
-impl Default for NodeStatus {
-    fn default() -> Self {
-        NodeStatus::Pending
-    }
 }
 
 impl NodeStatus {

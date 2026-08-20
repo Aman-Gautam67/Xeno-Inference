@@ -63,9 +63,9 @@ impl SecurityClassifier {
         if first == "ls" || first == "dir" || first == "cat" || first == "type"
             || first == "head" || first == "tail" || first == "grep" || first == "find"
             || first == "echo" || first == "pwd" || first == "which" || first == "where"
-            || (first == "git" && tokens.get(1).map_or(false, |&sub| matches!(sub, "status" | "diff" | "log" | "show" | "branch" | "rev-parse")))
-            || (first == "cargo" && tokens.get(1).map_or(false, |&sub| matches!(sub, "check" | "test" | "build" | "clippy" | "tree" | "version")))
-            || (first == "npm" && tokens.get(1).map_or(false, |&sub| matches!(sub, "test" | "run" | "list" | "audit")))
+            || (first == "git" && tokens.get(1).is_some_and(|&sub| matches!(sub, "status" | "diff" | "log" | "show" | "branch" | "rev-parse")))
+            || (first == "cargo" && tokens.get(1).is_some_and(|&sub| matches!(sub, "check" | "test" | "build" | "clippy" | "tree" | "version")))
+            || (first == "npm" && tokens.get(1).is_some_and(|&sub| matches!(sub, "test" | "run" | "list" | "audit")))
             || (lower.contains("pytest") || lower.contains("cargo test"))
         {
             return SecurityTier::Tier1Safe;
@@ -104,7 +104,7 @@ impl PythonSanitizer {
         if first == "python" || first == "python3" || first == "py" {
             // Rewrite to strict Python path
             let rest = if tokens.len() > 1 {
-                &trimmed[tokens[0].len()..].trim_start()
+                trimmed[tokens[0].len()..].trim_start()
             } else {
                 ""
             };

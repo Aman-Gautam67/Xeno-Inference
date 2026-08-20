@@ -47,6 +47,7 @@ pub struct StepTelemetry {
 }
 
 impl StepTelemetry {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         session_id: impl Into<String>,
         agent_role: impl Into<String>,

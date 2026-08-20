@@ -7,18 +7,13 @@ use xeno_dag::prelude::*;
 use xeno_telemetry::prelude::*;
 
 /// Active display pane tab.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ActivePane {
     Timeline,
     Dag,
     Diff,
+    #[default]
     Prompt,
-}
-
-impl Default for ActivePane {
-    fn default() -> Self {
-        ActivePane::Prompt
-    }
 }
 
 /// Main application state for `xeno-cli`.

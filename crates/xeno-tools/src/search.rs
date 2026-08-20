@@ -23,6 +23,7 @@ impl SearchEngine {
     }
 
     /// Searches `search_path` for files matching `pattern` and containing `query`.
+    #[allow(clippy::too_many_arguments)]
     pub fn search(
         &self,
         search_path: &Path,

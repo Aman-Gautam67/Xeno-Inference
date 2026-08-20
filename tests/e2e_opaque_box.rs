@@ -355,11 +355,11 @@ async fn test_f33_to_f37_dag_state_tracker_and_telemetry() {
 #[tokio::test]
 async fn test_f38_to_f42_agent_harness_swarm_and_consensus() {
     // F38-F42: PAORV State Machine, Swarm Roles, Multi-tier Memory, Consensus
-    let roles = vec!["commander", "architect", "coder", "qa_tester", "red_team"];
+    let roles = ["commander", "architect", "coder", "qa_tester", "red_team"];
     assert_eq!(roles.len(), 5);
 
     // 3-way consensus evaluation rule:
-    let votes = vec![true, true, true]; // 3/3 agree
+    let votes = [true, true, true]; // 3/3 agree
     let consensus_ratio = votes.iter().filter(|&&v| v).count() as f64 / votes.len() as f64;
     assert_eq!(consensus_ratio, 1.0); // 100% agreement -> approved
 }
@@ -385,7 +385,7 @@ async fn test_f43_to_f47_dual_surface_tui_and_canvas_contracts() {
 #[tokio::test]
 async fn test_f48_end_to_end_vertical_slice_contract() {
     // F48: Complete Vertical Slice Contract Verification
-    let step_sequence = vec![
+    let step_sequence = [
         "USER_PROMPT_INGESTED",
         "INTENT_ROUTING_RESOLVED",
         "STREAMING_TOKENS_EMITTED",

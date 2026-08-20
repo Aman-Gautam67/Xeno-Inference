@@ -3,10 +3,11 @@
 use serde::{Deserialize, Serialize};
 
 /// Discrete states in the PAORV continuous execution loop.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum PAORVPhase {
     /// 1. Plan: Goal decomposition, context pinning, DAG node synthesis.
+    #[default]
     Plan,
     /// 2. Act: Tool selection, schema validation, and dispatch.
     Act,
@@ -22,12 +23,6 @@ pub enum PAORVPhase {
     Completed,
     /// Terminal failed state.
     Failed,
-}
-
-impl Default for PAORVPhase {
-    fn default() -> Self {
-        PAORVPhase::Plan
-    }
 }
 
 impl PAORVPhase {

@@ -93,7 +93,7 @@ fn test_adversarial_token_metrics_and_numeric_extremes() {
 #[test]
 fn test_adversarial_unicode_and_control_characters() {
     // Strings containing Astral Plane Emojis, Zero-Width Joiners, RTL overrides, null bytes, and ANSI codes
-    let adversarial_strings = vec![
+    let adversarial_strings = [
         "🦀🚀👨‍👩‍👧‍👦💥",                                    // Complex emojis & ZWJ
         "\u{200B}\u{200C}\u{200D}\u{FEFF}",                   // Zero-width characters
         "\u{202E}gnirts desrever\u{202C}",                    // Right-to-left override

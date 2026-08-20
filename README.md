@@ -1,4 +1,4 @@
-```
+
 # [Sparkles] XENO INFERENCE — THE OMNI-MODAL AUTONOMOUS INFERENCE & SWARM AGENTIC PLATFORM
 ### *Next-Generation Local + Cloud AI Inference Engine, Spatial Canvas, Multi-Agent Swarm Harness & Sovereign Terminal Runtime*
 
@@ -717,4 +717,4 @@ By unifying an **Infinite Spatial Canvas**, a **Deep Thinking Inspector**, a **L
 *Target Platforms: Windows 11 / macOS Sonoma & Sequoia / Linux x86_64 & aarch64*  
 *Generated for: Workspace Sovereign AI Deployment*
 #   X e n o - I n f e r e n c e 
-```
+

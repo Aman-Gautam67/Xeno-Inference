@@ -84,6 +84,9 @@ export interface WorkspaceState {
   routingPolicy: RoutingPolicy;
   isAirGapped: boolean;
   isSidebarOpen: boolean;
+  isShortcutsOpen: boolean;
+  isExportOpen: boolean;
+  soundEnabled: boolean;
   
   // Telemetry
   telemetry: {
@@ -101,24 +104,24 @@ export interface WorkspaceState {
   canvasScale: number;
   canvasPan: { x: number; y: number };
 
-  // DAG
+  // DAG & Execution
   dagNodes: DAGNodeItem[];
   selectedDagNodeId: string | null;
 
-  // Deep Thinking
+  // Timeline / Deep Thinking
   timelineSteps: CognitiveStep[];
   speculativeBranches: SpeculativeBranch[];
 
-  // Terminal
+  // Terminal / ConPTY
   terminalLogs: TerminalLog[];
   currentCommand: string;
-  securityTier: "Tier 1: Safe (Auto)" | "Tier 2: Guarded (Preview)" | "Tier 3: Destructive (Approval)";
+  securityTier: string;
 
-  // Swarm
+  // Swarm Council
   swarmAgents: SwarmAgentInfo[];
   consensusRate: number;
 
-  // Diff
+  // AST Diff Studio
   diffFiles: DiffItem[];
 
   // Actions
@@ -127,14 +130,21 @@ export interface WorkspaceState {
   setRoutingPolicy: (policy: RoutingPolicy) => void;
   toggleAirGap: () => void;
   toggleSidebar: () => void;
+  toggleShortcuts: () => void;
+  toggleExport: () => void;
+  toggleSound: () => void;
   setSelectedNodeId: (id: string | null) => void;
   setSelectedDagNodeId: (id: string | null) => void;
   setCanvasScale: (scale: number) => void;
   setCanvasPan: (pan: { x: number; y: number }) => void;
   updateCanvasNodePosition: (id: string, x: number, y: number) => void;
+  addCanvasNode: (type: "prompt" | "subagent" | "code" | "diff") => void;
+  removeCanvasNode: (id: string) => void;
   executeCommand: (cmd: string) => void;
   dispatchSwarmTask: (task: string) => void;
   toggleStageDiff: (id: string) => void;
+  exportSessionJson: () => string;
+  importSessionJson: (jsonStr: string) => boolean;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
@@ -143,118 +153,122 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   routingPolicy: "reasoning",
   isAirGapped: false,
   isSidebarOpen: true,
+  isShortcutsOpen: false,
+  isExportOpen: false,
+  soundEnabled: true,
 
   telemetry: {
-    velocity: 148.6,
-    costUsd: 0.0234,
+    velocity: 84.6,
+    costUsd: 0.0412,
     vramUsedGb: 14.8,
     vramTotalGb: 24.0,
-    ttftMs: 28,
-    gpuLoadPct: 64.2,
+    ttftMs: 142,
+    gpuLoadPct: 78,
   },
-
-  canvasScale: 1.0,
-  canvasPan: { x: 0, y: 0 },
-  selectedNodeId: "node-coder",
 
   canvasNodes: [
     {
       id: "node-prompt",
       type: "prompt",
       x: 80,
-      y: 200,
+      y: 120,
       data: {
-        title: "User Prompt",
-        instruction: "Build AST validator and sandboxed ConPTY terminal runner with multi-role swarm consensus",
+        title: "User Directive",
+        instruction: "Build AST validator in Rust with character-exact diff replacements",
         status: "completed",
-        tokens: 342,
+        tokens: 340,
       },
     },
     {
       id: "node-coder",
       type: "subagent",
       x: 520,
-      y: 120,
+      y: 100,
       data: {
-        role: "coder",
-        model: "claude-3-7-sonnet",
-        phase: "Act: Multi-Replace File Synthesis",
-        progress: 88,
-        activeFile: "crates/xeno-tools/src/ast_validator.rs",
-        tokens: 1420,
+        role: "Coder Agent",
+        model: "Claude 3.7 Sonnet (Thinking)",
+        task: "Synthesizing AST validation engine in xeno-tools",
+        status: "running",
+        progress: 82,
+        tokensGenerated: 1420,
       },
     },
     {
       id: "node-code-block",
       type: "code",
-      x: 960,
+      x: 980,
       y: 60,
       data: {
         fileName: "ast_validator.rs",
         language: "rust",
-        code: `pub fn validate_syntax(&self, path: &Path, code: &str) -> Result<(), ToolError> {\n    match path.extension().and_then(|s| s.to_str()) {\n        Some("rs") => syn::parse_file(code).map(|_| ()).map_err(|e| ToolError::AstParseError(e.to_string())),\n        Some("json") => serde_json::from_str::<serde_json::Value>(code).map(|_| ()).map_err(|e| ToolError::AstParseError(e.to_string())),\n        _ => Ok(()),\n    }\n}`,
+        code: `pub fn validate_syntax(path: &Path, code: &str) -> Result<(), ToolError> {\n    match path.extension().and_then(|s| s.to_str()) {\n        Some("rs") => syn::parse_file(code).map(|_| ()).map_err(|e| ToolError::AstParseError(e.to_string())),\n        Some("json") => serde_json::from_str::<serde_json::Value>(code).map(|_| ()).map_err(|e| ToolError::AstParseError(e.to_string())),\n        _ => Ok(()),\n    }\n}`,
       },
     },
     {
       id: "node-diff",
       type: "diff",
-      x: 960,
+      x: 980,
       y: 380,
       data: {
-        filePath: "crates/xeno-router/src/privacy.rs",
-        diff: `--- original\n+++ replacement\n- pub fn scrub_pii(text: &str) -> String {\n+ pub fn scrub_pii_with_entropy(text: &str, threshold: f64) -> SanitizedResult {`,
+        filePath: "crates/xeno-tools/src/ast_validator.rs",
+        diff: `@@ -1,4 +1,8 @@\n-pub fn validate() {\n-    // stub\n-}\n+pub fn validate_syntax(&self, path: &Path, code: &str) -> Result<(), ToolError> {\n+    syn::parse_file(code).map(|_| ()).map_err(|e| ToolError::AstParseError(e.to_string()))\n+}`,
       },
     },
   ],
+  selectedNodeId: "node-coder",
+  canvasScale: 1.0,
+  canvasPan: { x: 0, y: 0 },
 
   dagNodes: [
     {
       id: "dag-1",
-      label: "Commander: Task Decomposition",
+      label: "Commander: Decompose Task",
       role: "commander",
       status: "completed",
-      model: "claude-3-7-sonnet",
+      model: "Claude 3.7 Sonnet",
       dependencies: [],
-      stdout: "Decomposed task into 3 parallel execution branches with zero circularity.",
-      latencyMs: 142,
+      latencyMs: 310,
+      stdout: "[Commander] Decomposed objective into 3 subtasks: AST schema design, tool implementation, and verification test.",
     },
     {
       id: "dag-2",
-      label: "Architect: API & Schema Validation",
+      label: "Architect: AST Validation Design",
       role: "architect",
       status: "completed",
-      model: "deepseek-r1",
+      model: "DeepSeek R1",
       dependencies: ["dag-1"],
-      stdout: "Verified contracts: XenoAgentStepEvent, XenoDAGNode, and TokenMetrics.",
-      latencyMs: 310,
+      latencyMs: 620,
+      stdout: "[Architect] Syn parse_file contract confirmed with 0 new dependencies.",
     },
     {
       id: "dag-3",
-      label: "Coder: AST Atomic Patching",
+      label: "Coder: Implement syn Parser",
       role: "coder",
       status: "running",
-      model: "claude-3-7-sonnet",
+      model: "Claude 3.7 Sonnet",
       dependencies: ["dag-2"],
-      stdout: "Applying multi_replace_file_content with exact character substring bounds.",
-      latencyMs: 420,
+      latencyMs: 1420,
+      stdout: "[Coder] Generated crates/xeno-tools/src/ast_validator.rs with full test coverage.",
     },
     {
       id: "dag-4",
-      label: "QA Tester: Cargo Unit & E2E Tests",
+      label: "QA Tester: Unit & Boundary Tests",
       role: "qa",
       status: "pending",
-      model: "local-gguf",
+      model: "Qwen 2.5 72B Local",
       dependencies: ["dag-3"],
       latencyMs: 0,
+      stdout: "",
     },
     {
       id: "dag-5",
-      label: "Red Team: Air-Gap & Secret Scanner",
+      label: "Red-Team: Air-Gap & Fuzzing Audit",
       role: "red_team",
       status: "pending",
-      model: "deepseek-r1",
+      model: "DeepSeek R1",
       dependencies: ["dag-3"],
       latencyMs: 0,
+      stdout: "",
     },
   ],
   selectedDagNodeId: "dag-3",
@@ -263,46 +277,46 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     {
       id: "step-1",
       stepNumber: 1,
-      title: "Semantic Goal Decomposition & Context Ingestion",
+      title: "Goal Ingestion & Constraint Decomposition",
       phase: "Goal Decomposition",
-      latencyMs: 110,
+      latencyMs: 180,
       tokens: 420,
-      speed: 165.2,
+      speed: 92.4,
       status: "verified",
       details: [
-        "Parsed prompt: 'Implement AST validation and sandboxed ConPTY runner'",
-        "Mapped 4 affected crates: xeno-core, xeno-tools, xeno-router, xeno-agent",
-        "Configured security gate: Tier 2 Guarded Operations with AST snapshot",
+        "Ingested user goal: upgrade spatial canvas & execution DAG",
+        "Pinned constraints: no breaking Rust API changes, zero CoT leakages, air-gap lock enforcement",
+        "Formulated 5-step execution plan across xeno-tools and ui-canvas",
       ],
     },
     {
       id: "step-2",
       stepNumber: 2,
-      title: "AST Symbol Indexing & Tree-Sitter Validation",
+      title: "AST Character Replacement & Multi-Replace Engine",
       phase: "AST Navigation",
-      latencyMs: 240,
-      tokens: 610,
-      speed: 152.0,
+      latencyMs: 460,
+      tokens: 1120,
+      speed: 88.2,
       status: "verified",
       details: [
-        "Traversed crates/xeno-tools/src/ast_validator.rs",
-        "Checked syn parser for Rust, serde_json for JSON, and toml for TOML",
-        "Confirmed zero circular symbol references in workspace AST",
+        "Scanned crates/xeno-tools/src/file_engine.rs for character replacement boundaries",
+        "Verified line-bounded substring replacement with rollback stack capability",
+        "Confirmed Syn AST validation prevents corrupt files from writing to disk",
       ],
     },
     {
       id: "step-3",
       stepNumber: 3,
-      title: "ConPTY Virtual Session Spawn & Job Object Bindings",
+      title: "PAORV State Loop & Subagent Dispatch",
       phase: "Tool Invocation",
-      latencyMs: 380,
-      tokens: 890,
-      speed: 148.6,
+      latencyMs: 780,
+      tokens: 1840,
+      speed: 84.6,
       status: "executing",
       details: [
-        "Invoked tool: terminal_exec with command 'cargo test --workspace'",
-        "Bound process tree to Windows Job Object (KILL_ON_JOB_CLOSE enabled)",
-        "Capturing real-time stdout/stderr stream without PTY deadlock",
+        "Invoked multi_replace_file_content with character exact match",
+        "Subscribed to Token Bus streaming chunks at 84.6 tok/s",
+        "Streaming live diff projection directly to Spatial Canvas",
       ],
     },
   ],
@@ -310,92 +324,86 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   speculativeBranches: [
     {
       id: "branch-a",
-      name: "Branch A: Direct In-Memory FFI Binding",
-      score: 64.5,
-      status: "pruned",
-      rationale: "Direct C++ FFI linking creates segfault vulnerability risking UI thread crash.",
-      latencyEstimateMs: 45,
+      name: "Branch A: Pure Syn Parser AST validation",
+      score: 96,
+      status: "selected",
+      rationale: "Eliminates syntax errors before file writes; zero external binary runtime dependencies.",
+      latencyEstimateMs: 140,
     },
     {
       id: "branch-b",
-      name: "Branch B: Sandboxed ConPTY + Local Socket IPC",
-      score: 98.2,
-      status: "selected",
-      rationale: "Guarantees process isolation, zero UI crash risk, and clean timeout watchdog recovery.",
-      latencyEstimateMs: 18,
+      name: "Branch B: Regex Heuristic Pre-validation",
+      score: 64,
+      status: "pruned",
+      rationale: "Pruned: Vulnerable to false positives on multi-line macros and raw string literals.",
+      latencyEstimateMs: 45,
     },
   ],
 
   terminalLogs: [
     {
-      id: "log-1",
-      timestamp: "18:44:02",
+      id: "tlog-1",
+      timestamp: "18:42:01",
       type: "system",
-      content: "[XENO-PTY] Session #pty-8492 initialized (Windows ConPTY + JobObject sandbox)",
+      content: "[SYSTEM] XENO Virtual PTY initialized (Windows ConPTY + Job Object Isolation).",
     },
     {
-      id: "log-2",
-      timestamp: "18:44:03",
+      id: "tlog-2",
+      timestamp: "18:42:05",
       type: "command",
       content: "$ cargo test --workspace",
     },
     {
-      id: "log-3",
-      timestamp: "18:44:05",
+      id: "tlog-3",
+      timestamp: "18:42:12",
       type: "stdout",
-      content: "   Compiling xeno-core v0.1.0\n   Compiling xeno-tools v0.1.0\n   Compiling xeno-router v0.1.0\n   Compiling xeno-agent v0.1.0\n    Finished test profile [unoptimized + debuginfo] target(s) in 2.14s",
+      content: "test result: ok. 120 passed; 0 failed; 0 ignored; finished in 1.42s",
     },
     {
-      id: "log-4",
-      timestamp: "18:44:06",
-      type: "stdout",
-      content: "     Running unittests src/lib.rs (xeno_tools)\ntest ast_validator::tests::test_rust_ast_validation ... ok\ntest pty::tests::test_pty_tier3_rejection ... ok\ntest file_engine::tests::test_multi_replace_and_slice ... ok\ntest python_runner::tests::test_python_runner_inline ... ok",
-    },
-    {
-      id: "log-5",
-      timestamp: "18:44:07",
+      id: "tlog-4",
+      timestamp: "18:42:15",
       type: "intervention",
-      content: "[XENO AI INTERVENTION] 120+ tests passed cleanly. 0 failures. AST syntax invariant verified.",
+      content: "[SAFETY GUARDIAN] Tier 2 Guarded Action Auto-Approved (Diff snapshot cached with instant rollback).",
     },
   ],
   currentCommand: "",
-  securityTier: "Tier 2: Guarded (Preview)",
+  securityTier: "Tier 1: Safe Read-Only",
 
   swarmAgents: [
     {
       role: "commander",
-      title: "Commander Agent",
-      model: "Claude 3.7 Sonnet (Thinking)",
+      title: "Council Commander",
+      model: "Claude 3.7 Sonnet",
       status: "planning",
-      currentTask: "Orchestrating task decomposition & token budget allocation",
-      tokensGenerated: 1420,
-      voteScore: 100,
+      currentTask: "Orchestrating sub-agent execution order in DAG",
+      tokensGenerated: 2140,
+      voteScore: 98,
     },
     {
       role: "architect",
       title: "System Architect",
       model: "DeepSeek R1",
-      status: "idle",
-      currentTask: "Validating API schemas & topological dependency tree",
-      tokensGenerated: 2180,
-      voteScore: 98,
+      status: "planning",
+      currentTask: "Verifying cross-crate dependency graphs and schemas",
+      tokensGenerated: 1890,
+      voteScore: 95,
     },
     {
       role: "coder",
       title: "Lead Coder",
       model: "Claude 3.7 Sonnet",
       status: "coding",
-      currentTask: "Synthesizing atomic AST patches for xeno-tools & xeno-dag",
-      tokensGenerated: 4890,
-      voteScore: 96,
+      currentTask: "Synthesizing character-exact AST diffs in xeno-tools",
+      tokensGenerated: 4320,
+      voteScore: 100,
     },
     {
       role: "qa",
       title: "QA Tester",
-      model: "Local Qwen 2.5 7B (GGUF)",
+      model: "Qwen 2.5 72B Local",
       status: "testing",
-      currentTask: "Running automated unit, boundary, and regression tests",
-      tokensGenerated: 940,
+      currentTask: "Running 120+ cargo tests and boundary condition sweeps",
+      tokensGenerated: 1420,
       voteScore: 100,
     },
     {
@@ -435,6 +443,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   setRoutingPolicy: (policy) => set({ routingPolicy: policy }),
   toggleAirGap: () => set((s) => ({ isAirGapped: !s.isAirGapped })),
   toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
+  toggleShortcuts: () => set((s) => ({ isShortcutsOpen: !s.isShortcutsOpen })),
+  toggleExport: () => set((s) => ({ isExportOpen: !s.isExportOpen })),
+  toggleSound: () => set((s) => ({ soundEnabled: !s.soundEnabled })),
   setSelectedNodeId: (id) => set({ selectedNodeId: id }),
   setSelectedDagNodeId: (id) => set({ selectedDagNodeId: id }),
   setCanvasScale: (scale) => set({ canvasScale: scale }),
@@ -445,6 +456,59 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       canvasNodes: state.canvasNodes.map((n) =>
         n.id === id ? { ...n, x, y } : n
       ),
+    }));
+  },
+
+  addCanvasNode: (type) => {
+    const id = `node-${type}-${Date.now()}`;
+    let data: Record<string, any> = {};
+    const pan = get().canvasPan;
+    const scale = get().canvasScale;
+    const x = (-pan.x + 300) / scale;
+    const y = (-pan.y + 200) / scale;
+
+    if (type === "prompt") {
+      data = {
+        title: "New Instruction",
+        instruction: "Enter directive here...",
+        status: "pending",
+        tokens: 0,
+      };
+    } else if (type === "subagent") {
+      data = {
+        role: "Specialist Subagent",
+        model: "Claude 3.7 Sonnet",
+        task: "Autonomous task execution",
+        status: "planning",
+        progress: 0,
+        tokensGenerated: 0,
+      };
+    } else if (type === "code") {
+      data = {
+        fileName: "new_file.rs",
+        language: "rust",
+        code: "// Write code here...\npub fn solve() {\n}\n",
+      };
+    } else if (type === "diff") {
+      data = {
+        filePath: "src/modified.rs",
+        diff: "@@ -1,1 +1,2 @@\n-old code\n+new code",
+      };
+    }
+
+    set((state) => ({
+      canvasNodes: [
+        ...state.canvasNodes,
+        { id, type, x, y, data },
+      ],
+      selectedNodeId: id,
+    }));
+  },
+
+  removeCanvasNode: (id) => {
+    set((state) => ({
+      canvasNodes: state.canvasNodes.filter((n) => n.id !== id),
+      selectedNodeId: state.selectedNodeId === id ? null : state.selectedNodeId,
     }));
   },
 
@@ -504,5 +568,45 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         d.id === id ? { ...d, staged: !d.staged } : d
       ),
     }));
+  },
+
+  exportSessionJson: () => {
+    const s = get();
+    const snapshot = {
+      timestamp: new Date().toISOString(),
+      activeView: s.activeView,
+      selectedModel: s.selectedModel,
+      routingPolicy: s.routingPolicy,
+      isAirGapped: s.isAirGapped,
+      telemetry: s.telemetry,
+      canvasNodes: s.canvasNodes,
+      dagNodes: s.dagNodes,
+      timelineSteps: s.timelineSteps,
+      speculativeBranches: s.speculativeBranches,
+      swarmAgents: s.swarmAgents,
+      diffFiles: s.diffFiles,
+    };
+    return JSON.stringify(snapshot, null, 2);
+  },
+
+  importSessionJson: (jsonStr) => {
+    try {
+      const parsed = JSON.parse(jsonStr);
+      if (parsed.canvasNodes && parsed.dagNodes) {
+        set({
+          canvasNodes: parsed.canvasNodes || [],
+          dagNodes: parsed.dagNodes || [],
+          timelineSteps: parsed.timelineSteps || [],
+          speculativeBranches: parsed.speculativeBranches || [],
+          swarmAgents: parsed.swarmAgents || [],
+          diffFiles: parsed.diffFiles || [],
+          selectedModel: parsed.selectedModel || "claude-3-7-sonnet",
+        });
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   },
 }));

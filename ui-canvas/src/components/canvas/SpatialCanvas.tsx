@@ -4,6 +4,7 @@ import { PromptCanvasNode } from "./nodes/PromptCanvasNode";
 import { AgentCanvasNode } from "./nodes/AgentCanvasNode";
 import { CodeEditorCanvasNode } from "./nodes/CodeEditorCanvasNode";
 import { DiffCanvasNode } from "./nodes/DiffCanvasNode";
+import { NodePaletteBar } from "./NodePaletteBar";
 import { ZoomIn, ZoomOut, Maximize2, Move } from "lucide-react";
 
 export const SpatialCanvas: React.FC = () => {
@@ -106,6 +107,9 @@ export const SpatialCanvas: React.FC = () => {
       onMouseUp={handleMouseUp}
       className="flex-1 relative w-full h-[calc(100vh-3.5rem)] overflow-hidden canvas-grid-pattern cursor-grab active:cursor-grabbing bg-void"
     >
+      {/* Floating Node Palette */}
+      <NodePaletteBar />
+
       {/* Zoom Controls Overlay */}
       <div className="absolute bottom-28 right-6 z-20 flex items-center space-x-1 p-1.5 rounded-xl border border-border-700 bg-surface-900/90 backdrop-blur-xl shadow-2xl">
         <button

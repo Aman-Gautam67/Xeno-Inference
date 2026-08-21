@@ -1,5 +1,5 @@
-﻿import React from "react";
-import { useWorkspaceStore } from "./stores/workspaceStore";
+﻿import React, { useEffect } from "react";
+import { useWorkspaceStore, ViewMode } from "./stores/workspaceStore";
 import { HeaderNav } from "./components/layout/HeaderNav";
 import { SidebarExplorer } from "./components/layout/SidebarExplorer";
 import { TelemetryHUD } from "./components/layout/TelemetryHUD";
@@ -10,12 +10,78 @@ import { DeepThinkingTimeline } from "./components/timeline/DeepThinkingTimeline
 import { SandboxedTerminalView } from "./components/terminal/SandboxedTerminalView";
 import { ASTDiffStudioView } from "./components/diff/ASTDiffStudioView";
 import { MultiAgentSwarmView } from "./components/swarm/MultiAgentSwarmView";
+import { ShortcutsModal } from "./components/modals/ShortcutsModal";
+import { SessionExportModal } from "./components/modals/SessionExportModal";
 
 export const App: React.FC = () => {
-  const { activeView } = useWorkspaceStore();
+  const { 
+    activeView, 
+    setActiveView, 
+    toggleSidebar, 
+    toggleShortcuts, 
+    toggleExport, 
+    isShortcutsOpen, 
+    isExportOpen 
+  } = useWorkspaceStore();
+
+  // Global Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore when typing in input or textarea
+      if (
+        e.target instanceof HTMLInputElement || 
+        e.target instanceof HTMLTextAreaElement || 
+        e.target instanceof HTMLSelectElement
+      ) {
+        if (e.key === "Escape") {
+          (e.target as HTMLElement).blur();
+        }
+        return;
+      }
+
+      if (e.key === "Escape") {
+        if (isShortcutsOpen) toggleShortcuts();
+        if (isExportOpen) toggleExport();
+        return;
+      }
+
+      if (e.key === "?" || (e.shiftKey && e.key === "/")) {
+        e.preventDefault();
+        toggleShortcuts();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+        e.preventDefault();
+        toggleExport();
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggleSidebar();
+        return;
+      }
+
+      // 1-6 View Switcher
+      const views: ViewMode[] = ["canvas", "dag", "timeline", "terminal", "diff", "swarm"];
+      const keyNum = parseInt(e.key, 10);
+      if (keyNum >= 1 && keyNum <= 6) {
+        e.preventDefault();
+        setActiveView(views[keyNum - 1]);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [setActiveView, toggleSidebar, toggleShortcuts, toggleExport, isShortcutsOpen, isExportOpen]);
 
   return (
     <div className="w-screen h-screen bg-void text-neutral-100 flex flex-col justify-between relative overflow-hidden font-sans select-none">
+      {/* Modals */}
+      <ShortcutsModal />
+      <SessionExportModal />
+
       {/* Top Navigation */}
       <HeaderNav />
 

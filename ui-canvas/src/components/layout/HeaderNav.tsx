@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { 
   useWorkspaceStore, 
   ViewMode, 
@@ -15,7 +15,11 @@ import {
   ShieldCheck, 
   Cpu, 
   Menu,
-  Sparkles
+  Sparkles,
+  Keyboard,
+  FileJson,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 
 export const HeaderNav: React.FC = () => {
@@ -27,7 +31,11 @@ export const HeaderNav: React.FC = () => {
     isAirGapped,
     toggleAirGap,
     isSidebarOpen,
-    toggleSidebar
+    toggleSidebar,
+    toggleShortcuts,
+    toggleExport,
+    soundEnabled,
+    toggleSound
   } = useWorkspaceStore();
 
   const navTabs: { id: ViewMode; label: string; icon: React.ReactNode }[] = [
@@ -115,6 +123,35 @@ export const HeaderNav: React.FC = () => {
             <option value="local-gguf" className="bg-surface-900 text-neutral-200">Local Llama 3.3 (GGUF / CUDA)</option>
             <option value="groq-llama3" className="bg-surface-900 text-neutral-200">Groq LPU (500+ tok/s)</option>
           </select>
+        </div>
+
+        {/* QOL Utilities: Export, Shortcuts, Audio Feedback */}
+        <div className="flex items-center space-x-1 pl-1 border-l border-border-700">
+          <button
+            onClick={toggleExport}
+            className="p-1.5 rounded-lg border border-border-700 hover:border-cyan-500/50 hover:bg-surface-800 text-neutral-400 hover:text-cyan-400 transition-all"
+            title="Export / Import Session State"
+          >
+            <FileJson className="w-4 h-4" />
+          </button>
+          <button
+            onClick={toggleShortcuts}
+            className="p-1.5 rounded-lg border border-border-700 hover:border-cyan-500/50 hover:bg-surface-800 text-neutral-400 hover:text-cyan-400 transition-all"
+            title="Keyboard Shortcuts (Shift + ?)"
+          >
+            <Keyboard className="w-4 h-4" />
+          </button>
+          <button
+            onClick={toggleSound}
+            className={`p-1.5 rounded-lg border transition-all ${
+              soundEnabled
+                ? "border-cyan-500/40 text-cyan-400 bg-cyan-500/10"
+                : "border-border-700 text-neutral-500 hover:bg-surface-800"
+            }`}
+            title={soundEnabled ? "Audio / Haptic Feedback ON" : "Audio Feedback Muted"}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
         </div>
       </div>
     </header>

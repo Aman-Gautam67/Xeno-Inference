@@ -195,7 +195,7 @@ const getInitialMemoryMb = () => {
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   activeView: "home",
-  themeMode: "light",
+  themeMode: (typeof window !== "undefined" && localStorage.getItem("xeno_theme") === "dark") ? "dark" : "light",
   selectedModel: "claude-3-7-sonnet",
   routingPolicy: "reasoning",
   isAirGapped: false,
@@ -515,9 +515,15 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       if (next === "dark") {
         document.documentElement.classList.add("dark");
         document.documentElement.classList.remove("light");
+        document.body.classList.add("dark");
+        document.body.classList.remove("light");
+        localStorage.setItem("xeno_theme", "dark");
       } else {
         document.documentElement.classList.remove("dark");
         document.documentElement.classList.add("light");
+        document.body.classList.remove("dark");
+        document.body.classList.add("light");
+        localStorage.setItem("xeno_theme", "light");
       }
     }
     set({ themeMode: next });

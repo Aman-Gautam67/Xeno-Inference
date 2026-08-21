@@ -1,4 +1,4 @@
-﻿import { create } from "zustand";
+import { create } from "zustand";
 
 export type ViewMode = "home" | "canvas" | "browser" | "dag" | "timeline" | "terminal" | "diff" | "swarm";
 export type ProviderModel = 
@@ -744,15 +744,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     const text = input.toLowerCase().trim();
     if (!text) return { view: "home", message: "Empty prompt" };
 
-    // Tor / Web browsing
-    if (text.includes("browse") || text.includes("tor") || text.includes("onion") || text.includes("web") || text.includes("search") || text.includes("url") || text.includes("http")) {
-      get().navigateTorBrowser(input.replace(/^(browse|search for|open|go to)\s+/i, ""));
-      set({ activeView: "browser" });
-      return { view: "browser", message: "Opening Tor Sandboxed Browser..." };
-    }
-
     // AST Diff / Git Review
-    if (text.includes("diff") || text.includes("git") || text.includes("review") || text.includes("patch") || text.includes("stage") || text.includes("rollback")) {
+    if (text.includes("diff") || text.includes("patch") || text.includes("stage") || text.includes("rollback") || text.includes("git") || text.includes("review")) {
       set({ activeView: "diff" });
       return { view: "diff", message: "Opening AST Diff Studio..." };
     }
@@ -769,6 +762,13 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       get().dispatchSwarmTask(input);
       set({ activeView: "swarm" });
       return { view: "swarm", message: "Deploying 5-Role Swarm Council..." };
+    }
+
+    // Tor / Web browsing (exact word matching to avoid 'validator' matching 'tor')
+    if (/\b(tor|onion|browse|search|web|http|https)\b/.test(text) || text.includes(".onion")) {
+      get().navigateTorBrowser(input.replace(/^(browse|search for|open|go to)\s+/i, ""));
+      set({ activeView: "browser" });
+      return { view: "browser", message: "Opening Tor Sandboxed Browser..." };
     }
 
     // DAG / Dependency Graph

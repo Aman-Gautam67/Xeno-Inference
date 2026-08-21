@@ -1,5 +1,6 @@
 ﻿import React from "react";
-import { MessageSquare, Sparkles, CheckCircle2, Clock } from "lucide-react";
+import { MessageSquare, Sparkles, CheckCircle2, Clock, Trash2 } from "lucide-react";
+import { useWorkspaceStore } from "../../../stores/workspaceStore";
 
 export interface PromptCanvasNodeProps {
   id: string;
@@ -14,6 +15,8 @@ export interface PromptCanvasNodeProps {
 }
 
 export const PromptCanvasNode: React.FC<PromptCanvasNodeProps> = ({ id, data, isSelected, onSelect }) => {
+  const { removeCanvasNode } = useWorkspaceStore();
+
   return (
     <div
       onClick={onSelect}
@@ -33,13 +36,23 @@ export const PromptCanvasNode: React.FC<PromptCanvasNodeProps> = ({ id, data, is
         <div className="flex items-center space-x-1.5">
           {data.status === "completed" ? (
             <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
-              <CheckCircle2 className="w-3 h-3" /> VERIFIED
+              <CheckCircle2 className="w-3 h-3" /> PASS
             </span>
           ) : (
             <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-500/30">
               <Clock className="w-3 h-3 animate-spin" /> RUNNING
             </span>
           )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              removeCanvasNode(id);
+            }}
+            className="p-1 rounded hover:bg-surface-800 text-neutral-500 hover:text-rose-400 transition-all"
+            title="Delete Node"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
         </div>
       </div>
 

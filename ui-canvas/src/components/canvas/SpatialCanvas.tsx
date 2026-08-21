@@ -5,6 +5,7 @@ import { AgentCanvasNode } from "./nodes/AgentCanvasNode";
 import { CodeEditorCanvasNode } from "./nodes/CodeEditorCanvasNode";
 import { DiffCanvasNode } from "./nodes/DiffCanvasNode";
 import { NodePaletteBar } from "./NodePaletteBar";
+import { CanvasMiniMap } from "./CanvasMiniMap";
 import { ZoomIn, ZoomOut, Maximize2, Move } from "lucide-react";
 
 export const SpatialCanvas: React.FC = () => {
@@ -109,6 +110,9 @@ export const SpatialCanvas: React.FC = () => {
     >
       {/* Floating Node Palette */}
       <NodePaletteBar />
+
+      {/* Radar Mini-Map */}
+      <CanvasMiniMap />
 
       {/* Zoom Controls Overlay */}
       <div className="absolute bottom-28 right-6 z-20 flex items-center space-x-1 p-1.5 rounded-xl border border-border-700 bg-surface-900/90 backdrop-blur-xl shadow-2xl">

@@ -1,12 +1,19 @@
 ﻿import React, { useState } from "react";
 import { useWorkspaceStore } from "../../stores/workspaceStore";
-import { FileCode, Check, RotateCcw, ShieldCheck, GitCompare, Sparkles } from "lucide-react";
+import { FileCode, Check, RotateCcw, ShieldCheck, GitCompare, Sparkles, Filter, CheckCheck } from "lucide-react";
 
 export const ASTDiffStudioView: React.FC = () => {
   const { diffFiles, toggleStageDiff } = useWorkspaceStore();
   const [selectedDiffId, setSelectedDiffId] = useState(diffFiles[0]?.id || "");
+  const [filterMode, setFilterMode] = useState<"all" | "staged" | "unstaged">("all");
 
-  const activeDiff = diffFiles.find((d) => d.id === selectedDiffId) || diffFiles[0];
+  const filteredFiles = diffFiles.filter((d) => {
+    if (filterMode === "staged") return d.staged;
+    if (filterMode === "unstaged") return !d.staged;
+    return true;
+  });
+
+  const activeDiff = filteredFiles.find((d) => d.id === selectedDiffId) || filteredFiles[0] || diffFiles[0];
 
   return (
     <div className="flex-1 h-[calc(100vh-3.5rem)] flex bg-void text-xs font-mono overflow-hidden">
@@ -22,9 +29,37 @@ export const ASTDiffStudioView: React.FC = () => {
           </span>
         </div>
 
+        {/* Filter Pills */}
+        <div className="flex items-center space-x-1 bg-surface-950 p-1 rounded-xl border border-border-700">
+          <button
+            onClick={() => setFilterMode("all")}
+            className={`flex-1 py-1 rounded-lg text-[10px] font-bold transition-all ${
+              filterMode === "all" ? "bg-surface-800 text-cyan-300 shadow-sm" : "text-neutral-500 hover:text-neutral-300"
+            }`}
+          >
+            All ({diffFiles.length})
+          </button>
+          <button
+            onClick={() => setFilterMode("staged")}
+            className={`flex-1 py-1 rounded-lg text-[10px] font-bold transition-all ${
+              filterMode === "staged" ? "bg-emerald-950/60 text-emerald-300 shadow-sm" : "text-neutral-500 hover:text-neutral-300"
+            }`}
+          >
+            Staged ({diffFiles.filter((d) => d.staged).length})
+          </button>
+          <button
+            onClick={() => setFilterMode("unstaged")}
+            className={`flex-1 py-1 rounded-lg text-[10px] font-bold transition-all ${
+              filterMode === "unstaged" ? "bg-surface-800 text-amber-300 shadow-sm" : "text-neutral-500 hover:text-neutral-300"
+            }`}
+          >
+            Unstaged ({diffFiles.filter((d) => !d.staged).length})
+          </button>
+        </div>
+
         <div className="flex-1 space-y-2 overflow-y-auto">
-          {diffFiles.map((diff) => {
-            const isSelected = diff.id === selectedDiffId;
+          {filteredFiles.map((diff) => {
+            const isSelected = diff.id === activeDiff?.id;
             return (
               <div
                 key={diff.id}
@@ -62,7 +97,7 @@ export const ASTDiffStudioView: React.FC = () => {
         <div className="h-12 border-b border-border-700 bg-surface-900/90 px-6 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <FileCode className="w-4 h-4 text-cyan-400" />
-            <span className="font-bold text-neutral-200 text-xs">{activeDiff.filePath}</span>
+            <span className="font-bold text-neutral-200 text-xs">{activeDiff?.filePath}</span>
             <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
               <ShieldCheck className="w-3 h-3" /> AST Syntax Syn Validated
             </span>
@@ -70,15 +105,15 @@ export const ASTDiffStudioView: React.FC = () => {
 
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => toggleStageDiff(activeDiff.id)}
+              onClick={() => activeDiff && toggleStageDiff(activeDiff.id)}
               className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all ${
-                activeDiff.staged
+                activeDiff?.staged
                   ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 glow-emerald"
                   : "bg-surface-800 text-neutral-300 border-border-700 hover:border-emerald-500/40"
               }`}
             >
               <Check className="w-3.5 h-3.5" />
-              <span>{activeDiff.staged ? "Staged for Commit" : "Stage Changes"}</span>
+              <span>{activeDiff?.staged ? "Staged for Commit" : "Stage Changes"}</span>
             </button>
           </div>
         </div>
@@ -91,7 +126,7 @@ export const ASTDiffStudioView: React.FC = () => {
               Original AST (Target File)
             </div>
             <pre className="p-3 bg-surface-950 rounded-xl border border-border-700 text-rose-300/80 leading-relaxed overflow-x-auto">
-              <code>{activeDiff.originalCode}</code>
+              <code>{activeDiff?.originalCode}</code>
             </pre>
           </div>
 
@@ -101,7 +136,7 @@ export const ASTDiffStudioView: React.FC = () => {
               Synthesized AST Replacement
             </div>
             <pre className="p-3 bg-surface-950 rounded-xl border border-border-700 text-emerald-300/90 leading-relaxed overflow-x-auto">
-              <code>{activeDiff.modifiedCode}</code>
+              <code>{activeDiff?.modifiedCode}</code>
             </pre>
           </div>
         </div>

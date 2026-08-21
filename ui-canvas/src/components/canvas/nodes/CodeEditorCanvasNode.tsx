@@ -1,5 +1,6 @@
 ﻿import React from "react";
-import { FileCode, Play, Copy, Check } from "lucide-react";
+import { FileCode, Play, Copy, Check, Trash2 } from "lucide-react";
+import { useWorkspaceStore } from "../../../stores/workspaceStore";
 
 export interface CodeEditorCanvasNodeProps {
   id: string;
@@ -14,6 +15,7 @@ export interface CodeEditorCanvasNodeProps {
 
 export const CodeEditorCanvasNode: React.FC<CodeEditorCanvasNodeProps> = ({ id, data, isSelected, onSelect }) => {
   const [copied, setCopied] = React.useState(false);
+  const { removeCanvasNode } = useWorkspaceStore();
 
   const handleCopy = () => {
     navigator.clipboard.writeText(data.code);
@@ -54,6 +56,16 @@ export const CodeEditorCanvasNode: React.FC<CodeEditorCanvasNodeProps> = ({ id, 
           >
             <Play className="w-3 h-3" />
             <span>RUN</span>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              removeCanvasNode(id);
+            }}
+            className="p-1 rounded hover:bg-surface-800 text-neutral-500 hover:text-rose-400 transition-all"
+            title="Delete Node"
+          >
+            <Trash2 className="w-3 h-3" />
           </button>
         </div>
       </div>

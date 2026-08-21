@@ -1,5 +1,6 @@
 ﻿import React from "react";
-import { GitCompare, RotateCcw, Check } from "lucide-react";
+import { GitCompare, RotateCcw, Check, Trash2 } from "lucide-react";
+import { useWorkspaceStore } from "../../../stores/workspaceStore";
 
 export interface DiffCanvasNodeProps {
   id: string;
@@ -12,6 +13,8 @@ export interface DiffCanvasNodeProps {
 }
 
 export const DiffCanvasNode: React.FC<DiffCanvasNodeProps> = ({ id, data, isSelected, onSelect }) => {
+  const { removeCanvasNode } = useWorkspaceStore();
+
   return (
     <div
       onClick={onSelect}
@@ -26,7 +29,7 @@ export const DiffCanvasNode: React.FC<DiffCanvasNodeProps> = ({ id, data, isSele
           <div className="p-1 rounded-md bg-amber-500/10 text-amber-400">
             <GitCompare className="w-3.5 h-3.5" />
           </div>
-          <span className="text-xs font-bold font-mono text-amber-300 truncate max-w-[280px]">
+          <span className="text-xs font-bold font-mono text-amber-300 truncate max-w-[240px]">
             {data.filePath}
           </span>
         </div>
@@ -45,6 +48,16 @@ export const DiffCanvasNode: React.FC<DiffCanvasNodeProps> = ({ id, data, isSele
           >
             <Check className="w-3 h-3" />
             <span>Stage</span>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              removeCanvasNode(id);
+            }}
+            className="p-1 rounded hover:bg-surface-800 text-neutral-500 hover:text-rose-400 transition-all"
+            title="Delete Node"
+          >
+            <Trash2 className="w-3 h-3" />
           </button>
         </div>
       </div>

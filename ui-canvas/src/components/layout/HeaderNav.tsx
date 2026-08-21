@@ -1,9 +1,9 @@
-import React from "react";
 import { 
   useWorkspaceStore, 
   ViewMode, 
   ProviderModel 
 } from "../../stores/workspaceStore";
+import { useXenoWebSocket } from "../../hooks/useXenoWebSocket";
 import { 
   LayoutGrid, 
   GitFork, 
@@ -19,10 +19,12 @@ import {
   Keyboard,
   FileJson,
   Volume2,
-  VolumeX
+  VolumeX,
+  Radio
 } from "lucide-react";
 
 export const HeaderNav: React.FC = () => {
+  const wsStatus = useXenoWebSocket();
   const { 
     activeView, 
     setActiveView, 
@@ -68,6 +70,17 @@ export const HeaderNav: React.FC = () => {
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 border border-border-700 text-neutral-400 font-mono">
             v3.0.0-SOVEREIGN
           </span>
+          <div 
+            className={`flex items-center space-x-1 text-[10px] px-2 py-0.5 rounded font-mono border ${
+              wsStatus.connected 
+                ? "bg-emerald-950/60 text-emerald-400 border-emerald-500/40 glow-emerald" 
+                : "bg-surface-800 text-neutral-400 border-border-700"
+            }`}
+            title={wsStatus.connected ? `Connected to ${wsStatus.url} (${wsStatus.latencyMs}ms)` : `Local state mode (${wsStatus.url})`}
+          >
+            <Radio className={`w-3 h-3 ${wsStatus.connected ? "text-emerald-400 animate-pulse" : "text-neutral-500"}`} />
+            <span>{wsStatus.connected ? `WS: ${wsStatus.latencyMs}ms` : "STANDALONE"}</span>
+          </div>
         </div>
       </div>
 

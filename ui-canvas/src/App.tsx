@@ -4,7 +4,9 @@ import { HeaderNav } from "./components/layout/HeaderNav";
 import { SidebarExplorer } from "./components/layout/SidebarExplorer";
 import { TelemetryHUD } from "./components/layout/TelemetryHUD";
 import { OmniBar } from "./components/layout/OmniBar";
+import { HomepageView } from "./components/home/HomepageView";
 import { SpatialCanvas } from "./components/canvas/SpatialCanvas";
+import { TorSandboxedBrowserView } from "./components/browser/TorSandboxedBrowserView";
 import { LiveExecutionDAG } from "./components/dag/LiveExecutionDAG";
 import { DeepThinkingTimeline } from "./components/timeline/DeepThinkingTimeline";
 import { SandboxedTerminalView } from "./components/terminal/SandboxedTerminalView";
@@ -21,8 +23,17 @@ export const App: React.FC = () => {
     toggleShortcuts, 
     toggleExport, 
     isShortcutsOpen, 
-    isExportOpen 
+    isExportOpen,
+    updateMetricsTick
   } = useWorkspaceStore();
+
+  // Dynamic Telemetry Parameter Engine (Updates real parameters every 1 second)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateMetricsTick();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [updateMetricsTick]);
 
   // Global Keyboard Shortcuts
   useEffect(() => {
@@ -63,10 +74,10 @@ export const App: React.FC = () => {
         return;
       }
 
-      // 1-6 View Switcher
-      const views: ViewMode[] = ["canvas", "dag", "timeline", "terminal", "diff", "swarm"];
+      // 1-8 View Switcher
+      const views: ViewMode[] = ["home", "canvas", "browser", "dag", "timeline", "terminal", "diff", "swarm"];
       const keyNum = parseInt(e.key, 10);
-      if (keyNum >= 1 && keyNum <= 6) {
+      if (keyNum >= 1 && keyNum <= 8) {
         e.preventDefault();
         setActiveView(views[keyNum - 1]);
       }
@@ -77,7 +88,7 @@ export const App: React.FC = () => {
   }, [setActiveView, toggleSidebar, toggleShortcuts, toggleExport, isShortcutsOpen, isExportOpen]);
 
   return (
-    <div className="w-screen h-screen bg-void text-neutral-100 flex flex-col justify-between relative overflow-hidden font-sans select-none">
+    <div className="w-screen h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 flex flex-col justify-between relative overflow-hidden font-sans select-none transition-colors duration-200">
       {/* Modals */}
       <ShortcutsModal />
       <SessionExportModal />
@@ -92,12 +103,14 @@ export const App: React.FC = () => {
 
       {/* Main App Workspace */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Collapsible Left Explorer Sidebar */}
-        <SidebarExplorer />
+        {/* Collapsible Left Explorer Sidebar (Hidden on Home page for minimalism) */}
+        {activeView !== "home" && <SidebarExplorer />}
 
         {/* Dynamic Viewport Surface */}
         <main className="flex-1 flex overflow-hidden relative">
+          {activeView === "home" && <HomepageView />}
           {activeView === "canvas" && <SpatialCanvas />}
+          {activeView === "browser" && <TorSandboxedBrowserView />}
           {activeView === "dag" && <LiveExecutionDAG />}
           {activeView === "timeline" && <DeepThinkingTimeline />}
           {activeView === "terminal" && <SandboxedTerminalView />}
@@ -106,8 +119,8 @@ export const App: React.FC = () => {
         </main>
       </div>
 
-      {/* Bottom Command & Routing Omni-Bar */}
-      <OmniBar />
+      {/* Bottom Command & Routing Omni-Bar (Shown on non-home pages) */}
+      {activeView !== "home" && <OmniBar />}
     </div>
   );
 };

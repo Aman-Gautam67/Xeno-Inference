@@ -19,12 +19,12 @@ export const MultiAgentSwarmView: React.FC = () => {
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case "commander": return <Crown className="w-5 h-5 text-rose-400" />;
-      case "architect": return <Box className="w-5 h-5 text-purple-400" />;
-      case "coder": return <Code2 className="w-5 h-5 text-cyan-400" />;
-      case "qa": return <FlaskConical className="w-5 h-5 text-amber-400" />;
-      case "red_team": return <ShieldAlert className="w-5 h-5 text-crimson-400" />;
-      default: return <Users className="w-5 h-5 text-neutral-400" />;
+      case "commander": return <Crown className="w-5 h-5 text-stone-700 dark:text-stone-300" />;
+      case "architect": return <Box className="w-5 h-5 text-purple-600 dark:text-purple-400" />;
+      case "coder": return <Code2 className="w-5 h-5 text-stone-900 dark:text-stone-100" />;
+      case "qa": return <FlaskConical className="w-5 h-5 text-amber-600 dark:text-amber-400" />;
+      case "red_team": return <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400" />;
+      default: return <Users className="w-5 h-5 text-stone-500" />;
     }
   };
 
@@ -37,85 +37,85 @@ export const MultiAgentSwarmView: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 h-[calc(100vh-3.5rem)] flex flex-col bg-void text-xs font-mono overflow-y-auto p-8 space-y-6">
+    <div className="flex-1 h-[calc(100vh-3.5rem)] flex flex-col bg-stone-50 dark:bg-stone-950 text-xs font-mono overflow-y-auto p-8 space-y-6 transition-colors duration-200">
       {/* Top Banner */}
-      <div className="flex items-center justify-between pb-4 border-b border-border-700">
+      <div className="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-stone-800">
         <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
+          <div className="p-2.5 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm text-stone-700 dark:text-stone-300">
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-neutral-100 tracking-wider">MULTI-AGENT SWARM ARENA</h2>
-            <div className="text-[10px] text-neutral-500">Autonomous 5-Role Council • 3-Way Cross-Consensus Engine</div>
+            <h2 className="font-display font-bold text-base text-stone-900 dark:text-stone-100 tracking-wide uppercase">
+              Autonomous Swarm Council
+            </h2>
+            <div className="text-[11px] text-stone-500 font-sans">5-Role Multi-Agent Consensus & Deliberation Matrix</div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-4 bg-surface-900/80 p-3 rounded-2xl border border-border-700">
+        <div className="flex items-center space-x-4 bg-white dark:bg-stone-900 p-3 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-sm">
           <div>
-            <div className="text-[9px] text-neutral-500 uppercase">Cross-Consensus</div>
-            <div className="text-emerald-400 font-bold text-sm">{consensusRate}% PASS</div>
+            <div className="text-[9px] text-stone-400 dark:text-stone-500 uppercase font-bold">Consensus Rate</div>
+            <div className="text-emerald-700 dark:text-emerald-400 font-bold text-sm">{consensusRate}% PASS</div>
           </div>
-          <div className="w-20 h-2 bg-surface-800 rounded-full overflow-hidden">
-            <div className="h-full bg-emerald-400" style={{ width: `${consensusRate}%` }} />
+          <div className="w-24 h-2 bg-stone-100 dark:bg-stone-800 rounded-full overflow-hidden">
+            <div className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full" style={{ width: `${consensusRate}%` }} />
           </div>
         </div>
       </div>
 
-      {/* Swarm Council Cards */}
-      <div className="grid grid-cols-5 gap-4">
+      {/* 5-Role Swarm Council Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {swarmAgents.map((agent) => (
           <div
             key={agent.role}
-            className="p-4 rounded-2xl border border-border-700 bg-surface-900/90 backdrop-blur-xl shadow-xl space-y-3 relative overflow-hidden"
+            className="p-4 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm card-elevation space-y-3 flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between">
-              <div className="p-2 rounded-xl bg-surface-800 border border-border-700">
-                {getRoleIcon(agent.role)}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-stone-800">
+                <div className="p-2 rounded-xl bg-stone-50 dark:bg-stone-800">
+                  {getRoleIcon(agent.role)}
+                </div>
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400 font-bold">
+                  VOTE {agent.voteScore}%
+                </span>
               </div>
-              <span className={`text-[9px] px-2 py-0.5 rounded-full uppercase font-bold border ${
-                agent.status === "coding"
-                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 glow-cyan"
-                  : agent.status === "planning"
-                  ? "bg-purple-500/20 text-purple-300 border-purple-500/40"
-                  : "bg-surface-800 text-neutral-400 border-border-700"
-              }`}>
-                {agent.status}
-              </span>
+
+              <div>
+                <h3 className="font-display font-bold text-xs text-stone-900 dark:text-stone-100">{agent.title}</h3>
+                <div className="text-[10px] text-stone-500">{agent.model}</div>
+              </div>
+
+              <p className="text-[11px] text-stone-600 dark:text-stone-400 font-sans leading-tight bg-stone-50 dark:bg-stone-950 p-2.5 rounded-xl border border-stone-200 dark:border-stone-800">
+                {agent.currentTask}
+              </p>
             </div>
 
-            <div>
-              <div className="font-bold text-neutral-200 text-xs">{agent.title}</div>
-              <div className="text-[10px] text-neutral-500 truncate">{agent.model}</div>
-            </div>
-
-            <div className="text-[11px] text-neutral-300 bg-surface-950 p-2.5 rounded-xl border border-border-700/60 leading-relaxed min-h-[48px]">
-              {agent.currentTask}
-            </div>
-
-            <div className="pt-2 border-t border-border-700 flex items-center justify-between text-[10px] text-neutral-500">
-              <span className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-cyan-400" />
-                {agent.tokensGenerated} tok
-              </span>
-              <span className="text-emerald-400 font-bold">Vote: {agent.voteScore}%</span>
+            <div className="flex items-center justify-between text-[10px] text-stone-500 pt-2 border-t border-stone-100 dark:border-stone-800 font-mono">
+              <span>{agent.tokensGenerated.toLocaleString()} tok</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold uppercase">{agent.status}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Inter-Agent Message Log */}
-      <div className="space-y-3 pt-4">
-        <div className="flex items-center space-x-2 text-neutral-400">
-          <MessageSquare className="w-4 h-4 text-cyan-400" />
-          <span className="font-bold text-xs uppercase tracking-wider">Swarm Inter-Agent Cognitive Channel</span>
+      {/* Swarm Communication Stream */}
+      <div className="p-5 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 shadow-sm space-y-3">
+        <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center space-x-2">
+            <MessageSquare className="w-4 h-4 text-stone-500" />
+            <span className="font-display font-bold text-xs uppercase tracking-wider text-stone-800 dark:text-stone-200">
+              Inter-Agent Consensus Communication Bus
+            </span>
+          </div>
+          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">3-Way Quorum Verified</span>
         </div>
 
-        <div className="p-4 rounded-2xl border border-border-700 bg-surface-950 space-y-2.5">
+        <div className="space-y-2">
           {swarmMessages.map((msg, i) => (
-            <div key={i} className="flex items-start space-x-3 text-neutral-300 text-[11px]">
-              <span className="text-neutral-600">[{msg.time}]</span>
-              <span className="font-bold text-cyan-400 uppercase w-24 truncate">{msg.sender}:</span>
-              <span className="leading-relaxed flex-1">{msg.text}</span>
+            <div key={i} className="flex items-center space-x-3 text-xs leading-relaxed p-2 rounded-xl bg-stone-50/70 dark:bg-stone-950 border border-stone-200/60 dark:border-stone-800/60">
+              <span className="text-stone-400 font-mono text-[10px]">{msg.time}</span>
+              <span className="font-bold font-display text-stone-900 dark:text-stone-100 min-w-[90px]">{msg.sender}:</span>
+              <span className="text-stone-700 dark:text-stone-300 font-sans">{msg.text}</span>
             </div>
           ))}
         </div>

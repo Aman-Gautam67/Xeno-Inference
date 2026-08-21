@@ -61,18 +61,18 @@ export const SidebarExplorer: React.FC = () => {
           path: "crates/xeno-tools",
           children: [
             { name: "ast_validator.rs", isFolder: false, path: "crates/xeno-tools/src/ast_validator.rs" },
-            { name: "pty.rs", isFolder: false, path: "crates/xeno-tools/src/pty.rs" },
             { name: "file_engine.rs", isFolder: false, path: "crates/xeno-tools/src/file_engine.rs" },
+            { name: "pty.rs", isFolder: false, path: "crates/xeno-tools/src/pty.rs" },
+            { name: "safety.rs", isFolder: false, path: "crates/xeno-tools/src/safety.rs" },
           ],
         },
         {
-          name: "xeno-agent",
+          name: "xeno-dag",
           isFolder: true,
-          path: "crates/xeno-agent",
+          path: "crates/xeno-dag",
           children: [
-            { name: "harness.rs", isFolder: false, path: "crates/xeno-agent/src/harness.rs" },
-            { name: "swarm.rs", isFolder: false, path: "crates/xeno-agent/src/swarm.rs" },
-            { name: "paorv.rs", isFolder: false, path: "crates/xeno-agent/src/paorv.rs" },
+            { name: "graph.rs", isFolder: false, path: "crates/xeno-dag/src/graph.rs" },
+            { name: "node.rs", isFolder: false, path: "crates/xeno-dag/src/node.rs" },
           ],
         },
       ],
@@ -80,165 +80,155 @@ export const SidebarExplorer: React.FC = () => {
   ];
 
   const mcpTools = [
-    { name: "terminal_exec", desc: "Sandboxed ConPTY execution", tier: "Tier 1/2", active: true },
-    { name: "multi_replace_file", desc: "Atomic AST multi-replace", tier: "Tier 2", active: true },
-    { name: "lsp_diagnostics", desc: "rust-analyzer type checker", tier: "Tier 1", active: true },
-    { name: "fuzzy_glob_ripgrep", desc: "High-speed codebase search", tier: "Tier 1", active: true },
-    { name: "git_autopilot", desc: "Worktree branch manager", tier: "Tier 2", active: true },
+    { name: "multi_replace_file_content", tier: "Tier 2", desc: "Line-bounded AST character exact replacement" },
+    { name: "execute_sandboxed_command", tier: "Tier 1-3", desc: "Windows ConPTY execution with JobObject sandbox" },
+    { name: "fuzzy_glob_search", tier: "Tier 1", desc: "Ripgrep accelerated token & symbol indexing" },
+    { name: "ast_syntax_validate", tier: "Tier 1", desc: "Syn-driven syntax validator prior to commit" },
+    { name: "tor_socks_fetch", tier: "Tier 1", desc: "Anonymized Tor onion socket resolver" },
+  ];
+
+  const testSuites = [
+    { name: "xeno_core_tests", passed: 18, total: 18, status: "PASS" },
+    { name: "xeno_router_tests", passed: 39, total: 39, status: "PASS" },
+    { name: "xeno_tools_tests", passed: 15, total: 15, status: "PASS" },
+    { name: "xeno_dag_tests", passed: 14, total: 14, status: "PASS" },
+    { name: "e2e_vertical_slice", passed: 18, total: 18, status: "PASS" },
   ];
 
   return (
-    <aside className="w-64 border-r border-border-700 bg-surface-900/95 flex flex-col h-[calc(100vh-3.5rem)] text-xs font-mono select-none z-30">
-      {/* Sidebar Tabs */}
-      <div className="flex border-b border-border-700 bg-surface-950/60 p-1">
-        <button
-          onClick={() => setActiveTab("files")}
-          className={`flex-1 py-1.5 flex items-center justify-center space-x-1.5 rounded-md transition-all ${
-            activeTab === "files" ? "bg-surface-800 text-cyan-400 font-semibold" : "text-neutral-500 hover:text-neutral-300"
-          }`}
-        >
-          <Folder className="w-3.5 h-3.5" />
-          <span>Files</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("tools")}
-          className={`flex-1 py-1.5 flex items-center justify-center space-x-1.5 rounded-md transition-all ${
-            activeTab === "tools" ? "bg-surface-800 text-cyan-400 font-semibold" : "text-neutral-500 hover:text-neutral-300"
-          }`}
-        >
-          <Wrench className="w-3.5 h-3.5" />
-          <span>MCP Tools</span>
-        </button>
-        <button
-          onClick={() => setActiveTab("tests")}
-          className={`flex-1 py-1.5 flex items-center justify-center space-x-1.5 rounded-md transition-all ${
-            activeTab === "tests" ? "bg-surface-800 text-emerald-400 font-semibold" : "text-neutral-500 hover:text-neutral-300"
-          }`}
-        >
-          <FlaskConical className="w-3.5 h-3.5" />
-          <span>Tests</span>
-        </button>
-      </div>
+    <aside className="w-64 border-r border-stone-200 dark:border-stone-800 bg-white/95 dark:bg-stone-900/95 flex flex-col justify-between text-xs font-mono select-none z-30 transition-colors duration-200">
+      {/* Top Tab Bar */}
+      <div>
+        <div className="h-10 border-b border-stone-200 dark:border-stone-800 flex items-center bg-stone-50 dark:bg-stone-950">
+          <button
+            onClick={() => setActiveTab("files")}
+            className={`flex-1 h-full flex items-center justify-center space-x-1 border-r border-stone-200 dark:border-stone-800 transition-all ${
+              activeTab === "files" ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 font-bold border-b-2 border-b-stone-900 dark:border-b-stone-100" : "text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"
+            }`}
+          >
+            <FileCode className="w-3.5 h-3.5" />
+            <span>Files</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("tools")}
+            className={`flex-1 h-full flex items-center justify-center space-x-1 border-r border-stone-200 dark:border-stone-800 transition-all ${
+              activeTab === "tools" ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 font-bold border-b-2 border-b-stone-900 dark:border-b-stone-100" : "text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5" />
+            <span>MCP Tools</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("tests")}
+            className={`flex-1 h-full flex items-center justify-center space-x-1 transition-all ${
+              activeTab === "tests" ? "bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 font-bold border-b-2 border-b-stone-900 dark:border-b-stone-100" : "text-stone-500 hover:text-stone-800 dark:hover:text-stone-200"
+            }`}
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            <span>Tests</span>
+          </button>
+        </div>
 
-      {/* Explorer Content */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-4">
-        {activeTab === "files" && (
-          <div className="space-y-1">
-            <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2 font-semibold">Workspace Crates</div>
-            {fileTree.map((root) => (
-              <div key={root.path} className="space-y-1">
-                <div 
-                  onClick={() => toggleFolder(root.path)}
-                  className="flex items-center space-x-1.5 p-1 rounded hover:bg-surface-800 text-neutral-300 cursor-pointer"
-                >
-                  {openFolders[root.path] ? <ChevronDown className="w-3 h-3 text-neutral-500" /> : <ChevronRight className="w-3 h-3 text-neutral-500" />}
-                  {openFolders[root.path] ? <FolderOpen className="w-3.5 h-3.5 text-cyan-400" /> : <Folder className="w-3.5 h-3.5 text-neutral-400" />}
-                  <span>{root.name}</span>
-                </div>
+        {/* Tab Content */}
+        <div className="p-3 overflow-y-auto max-h-[calc(100vh-14rem)] space-y-1">
+          {activeTab === "files" && (
+            <div className="space-y-1">
+              {fileTree[0].children.map((crate) => {
+                const isOpen = openFolders[crate.path];
+                return (
+                  <div key={crate.path} className="space-y-0.5">
+                    <div
+                      onClick={() => toggleFolder(crate.path)}
+                      className="flex items-center space-x-1.5 py-1 px-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer text-stone-700 dark:text-stone-300 transition-all"
+                    >
+                      {isOpen ? <ChevronDown className="w-3.5 h-3.5 text-stone-400" /> : <ChevronRight className="w-3.5 h-3.5 text-stone-400" />}
+                      <Folder className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      <span className="font-semibold">{crate.name}</span>
+                    </div>
 
-                {openFolders[root.path] && (
-                  <div className="pl-4 space-y-1">
-                    {root.children?.map((crate) => (
-                      <div key={crate.path} className="space-y-0.5">
-                        <div 
-                          onClick={() => toggleFolder(crate.path)}
-                          className="flex items-center space-x-1.5 p-1 rounded hover:bg-surface-800 text-neutral-300 cursor-pointer"
-                        >
-                          {openFolders[crate.path] ? <ChevronDown className="w-3 h-3 text-neutral-500" /> : <ChevronRight className="w-3 h-3 text-neutral-500" />}
-                          <Folder className="w-3.5 h-3.5 text-purple-400" />
-                          <span>{crate.name}</span>
-                        </div>
-
-                        {openFolders[crate.path] && (
-                          <div className="pl-4 space-y-0.5">
-                            {crate.children?.map((file) => (
-                              <div
-                                key={file.path}
-                                onClick={() => setActiveView("diff")}
-                                className="flex items-center space-x-1.5 p-1 rounded hover:bg-surface-800 text-neutral-400 hover:text-cyan-300 cursor-pointer"
-                              >
-                                <FileCode className="w-3 h-3 text-cyan-400/70" />
-                                <span className="truncate">{file.name}</span>
-                              </div>
-                            ))}
+                    {isOpen && (
+                      <div className="pl-4 space-y-0.5">
+                        {crate.children.map((file) => (
+                          <div
+                            key={file.path}
+                            onClick={() => setActiveView("diff")}
+                            className="flex items-center space-x-1.5 py-1 px-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-all"
+                          >
+                            <FileCode className="w-3.5 h-3.5 text-stone-400" />
+                            <span>{file.name}</span>
                           </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === "tools" && (
-          <div className="space-y-2.5">
-            <div className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Registered MCP Tools</div>
-            {mcpTools.map((t) => (
-              <div key={t.name} className="p-2 rounded-lg border border-border-700 bg-surface-800/60 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-cyan-300">{t.name}</span>
-                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-surface-950 text-amber-400 border border-border-700">
-                    {t.tier}
-                  </span>
-                </div>
-                <div className="text-[10px] text-neutral-400">{t.desc}</div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === "tests" && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Test Matrix</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                120 / 120 PASS
-              </span>
+                );
+              })}
             </div>
+          )}
 
-            <div className="space-y-1.5">
-              {[
-                { name: "e2e_vertical_slice", passed: true, time: "0.01s" },
-                { name: "e2e_workloads", passed: true, time: "0.02s" },
-                { name: "e2e_boundary_tests", passed: true, time: "0.01s" },
-                { name: "e2e_opaque_box", passed: true, time: "0.01s" },
-                { name: "empirical_challenge_m2", passed: true, time: "0.48s" },
-              ].map((test) => (
-                <div key={test.name} className="p-2 rounded border border-border-700 bg-surface-850 flex items-center justify-between text-[11px]">
-                  <div className="flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-neutral-300 truncate max-w-[130px]">{test.name}</span>
+          {activeTab === "tools" && (
+            <div className="space-y-2">
+              {mcpTools.map((tool) => (
+                <div
+                  key={tool.name}
+                  className="p-2.5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50/70 dark:bg-stone-950 space-y-1"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-stone-800 dark:text-stone-200 truncate max-w-[140px]">
+                      {tool.name}
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400 font-bold">
+                      {tool.tier}
+                    </span>
                   </div>
-                  <span className="text-neutral-500 text-[10px]">{test.time}</span>
+                  <p className="text-[10px] text-stone-500 dark:text-stone-400 font-sans leading-tight">
+                    {tool.desc}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+
+          {activeTab === "tests" && (
+            <div className="space-y-2">
+              <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
+                <div className="flex items-center space-x-1.5 text-emerald-700 dark:text-emerald-300">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-bold">120/120 Passed</span>
+                </div>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">100%</span>
+              </div>
+
+              {testSuites.map((ts) => (
+                <div
+                  key={ts.name}
+                  className="p-2 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 flex items-center justify-between text-[11px]"
+                >
+                  <span className="text-stone-700 dark:text-stone-300 font-mono truncate">{ts.name}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">{ts.passed}/{ts.total}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Swarm Agents Mini Footer */}
-      <div className="p-3 border-t border-border-700 bg-surface-950/80 space-y-2">
-        <div className="flex items-center justify-between text-[10px] text-neutral-500 font-semibold uppercase">
-          <span className="flex items-center gap-1">
-            <Bot className="w-3.5 h-3.5 text-cyan-400" /> Active Swarm
-          </span>
-          <span className="text-cyan-400">5 Roles</span>
+      {/* Active Agents Snapshot */}
+      <div className="p-3 border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950 space-y-2">
+        <div className="flex items-center justify-between text-[10px] text-stone-500 uppercase tracking-wider font-bold">
+          <span>Active Council</span>
+          <span className="text-emerald-600 dark:text-emerald-400">5 Ready</span>
         </div>
-        <div className="grid grid-cols-5 gap-1">
-          {swarmAgents.map((a) => (
+
+        <div className="flex -space-x-1 overflow-hidden">
+          {swarmAgents.map((ag) => (
             <div
-              key={a.role}
+              key={ag.role}
               onClick={() => setActiveView("swarm")}
-              className="p-1 rounded bg-surface-800 border border-border-700 text-center cursor-pointer hover:border-cyan-400 transition-all"
-              title={`${a.title} (${a.status})`}
+              className="w-7 h-7 rounded-full border-2 border-white dark:border-stone-900 bg-stone-200 dark:bg-stone-800 flex items-center justify-center text-[10px] font-bold text-stone-700 dark:text-stone-300 cursor-pointer hover:scale-110 transition-transform shadow-sm"
+              title={`${ag.title} (${ag.model})`}
             >
-              <div className={`w-2 h-2 mx-auto rounded-full ${
-                a.status === "coding" ? "bg-cyan-400 animate-ping" : a.status === "planning" ? "bg-purple-400" : "bg-emerald-400"
-              }`} />
-              <span className="text-[8px] uppercase text-neutral-400">{a.role.slice(0, 3)}</span>
+              {ag.role[0].toUpperCase()}
             </div>
           ))}
         </div>
